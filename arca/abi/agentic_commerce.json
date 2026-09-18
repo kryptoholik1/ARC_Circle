@@ -1,0 +1,7 @@
+[
+  {"inputs": [{"name": "provider", "type": "address"}, {"name": "evaluator", "type": "address"}, {"name": "expiredAt", "type": "uint256"}, {"name": "description", "type": "string"}, {"name": "hook", "type": "address"}], "name": "createJob", "outputs": [{"name": "jobId", "type": "uint256"}], "stateMutability": "nonpayable", "type": "function"},
+  {"inputs": [{"name": "jobId", "type": "uint256"}, {"name": "amount", "type": "uint256"}, {"name": "optParams", "type": "bytes"}], "name": "setBudget", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
+  {"inputs": [{"name": "jobId", "type": "uint256"}, {"name": "optParams", "type": "bytes"}], "name": "fund", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
+  {"inputs": [{"name": "jobId", "type": "uint256"}, {"name": "deliverableHash", "type": "bytes32"}, {"name": "optParams", "type": "bytes"}], "name": "submit", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
+  {"inputs": [{"name": "jobId", "type": "uint256"}, {"name": "reason", "type": "bytes32"}, {"name": "optParams", "type": "bytes"}], "name": "complete", "outputs": [], "stateMutability": "nonpayable", "type": "function"}
+]

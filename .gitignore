@@ -1,0 +1,34 @@
+# Secrets — NEVER commit
+.env
+.env.*
+!.env.example
+env
+*.key
+*.pem
+
+# Claude-delivered files land here — keep them out of git
+Claude outputs/
+claude outputs/
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+*.log
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Foundry / Arc Foundry
+cache/
+out/
+broadcast/
+arca/.job_state.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
