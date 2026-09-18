@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arca — Agent Escrow (Arc)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f7fb;--surface:#fff;--surface-2:#eef1f7;--surface-3:#e7ebf3;
+  --border:#e0e5ef;--border-strong:#ccd3e2;--text:#101524;--text-dim:#5a6379;--text-faint:#8a93a8;
+  --accent:#3457f0;--accent-2:#2a48cc;--accent-soft:#e6ebfe;--violet:#7a54ef;--violet-soft:#efe9fe;
+  --good:#0f9d54;--good-soft:#e0f4e9;--warn:#c9781a;--warn-soft:#fbeeda;--crit:#dc4b46;--crit-soft:#fbe6e5;
+  --shadow:0 1px 2px rgba(16,21,36,.04),0 6px 20px rgba(16,21,36,.06);--shadow-lg:0 12px 40px rgba(16,21,36,.18);
+  --r:14px;--r-sm:9px;
+  --f-d:"Sora",system-ui,sans-serif;--f-b:"IBM Plex Sans",system-ui,sans-serif;--f-m:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0a0d15;--surface:#111726;--surface-2:#161d2f;--surface-3:#1d2639;--border:#232c42;--border-strong:#303a54;
+  --text:#eef1f8;--text-dim:#9aa4bb;--text-faint:#6c7690;--accent:#5c7cff;--accent-2:#4666f5;--accent-soft:#182247;
+  --violet:#9a7bff;--violet-soft:#241d44;--good:#38c07f;--good-soft:#12301f;--warn:#e0a04a;--warn-soft:#332413;
+  --crit:#f0655f;--crit-soft:#331917;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);--shadow-lg:0 16px 50px rgba(0,0,0,.6);
+}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:var(--f-b);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+h1,h2,h3{font-family:var(--f-d);margin:0;font-weight:600;letter-spacing:-.01em}
+.mono{font-family:var(--f-m);font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 60px}
+header{position:sticky;top:env(safe-area-inset-top,0);z-index:20;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.hin{max-width:1000px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--violet));display:grid;place-items:center;color:#fff;box-shadow:0 4px 12px rgba(52,87,240,.35)}
+.mark svg{width:18px;height:18px}
+.bname{font-family:var(--f-d);font-weight:700;font-size:17px}
+.bsub{font-size:10.5px;color:var(--text-faint)}
+.net{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:6px 11px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint)}
+.dot.ok{background:var(--good);box-shadow:0 0 0 3px var(--good-soft)}
+.dot.bad{background:var(--crit);box-shadow:0 0 0 3px var(--crit-soft)}
+.btn{border:1px solid transparent;border-radius:10px;padding:9px 15px;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.14s;white-space:nowrap}
+.btn svg{width:15px;height:15px}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(52,87,240,.3)}.btn-primary:hover{background:var(--accent-2)}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}.btn-ghost:hover{border-color:var(--border-strong)}
+.btn-good{background:var(--good);color:#fff}.btn-danger{background:var(--surface);border-color:var(--crit);color:var(--crit)}
+.btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-sm{padding:7px 11px;font-size:12px}
+.wallet{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:7px 9px 7px 14px;box-shadow:var(--shadow)}
+.wallet .b{display:flex;flex-direction:column;align-items:flex-end;line-height:1.3;white-space:nowrap}
+.wallet .b .top{font-family:var(--f-m);font-size:13.5px;font-weight:600}
+.wallet .b .top .u{font-size:10.5px;color:var(--text-faint);font-weight:500;margin-left:4px;font-family:var(--f-b)}
+.wallet .b .sub{font-size:10.5px;color:var(--text-faint)}
+.ava{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--violet),var(--accent));color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px;font-family:var(--f-d)}
+.hero{padding:26px 0 8px}
+.hero h1{font-size:26px;letter-spacing:-.02em}
+.hero p{color:var(--text-dim);margin:8px 0 0;max-width:60ch}
+.tag{display:inline-flex;gap:6px;align-items:center;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:20px;margin-bottom:12px}
+.banner{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);color:var(--text);border-radius:var(--r-sm);padding:11px 14px;margin:14px 0;font-size:13px;display:flex;gap:10px;align-items:center}
+.banner svg{width:17px;height:17px;color:var(--warn);flex:none}
+.banner.hide{display:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.stat .l{font-size:11.5px;color:var(--text-dim)}
+.stat .v{font-family:var(--f-d);font-size:22px;font-weight:700;margin-top:6px}.stat .v small{font-size:12px;color:var(--text-faint);font-family:var(--f-m)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+.card h2{font-size:16px;font-family:var(--f-b);margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:6px}
+.field input,.field textarea{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+.field input.mono{font-family:var(--f-m);font-size:12px}
+.field input:focus,.field textarea:focus{border-color:var(--accent);background:var(--surface)}
+.field{margin-bottom:12px}.hint{font-size:11px;color:var(--text-faint);margin-top:5px}
+.job{border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;background:var(--surface)}
+.job-h{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.job-h h3{font-size:14.5px;font-family:var(--f-b);font-weight:600}
+.job-h .id{font-family:var(--f-m);font-size:11px;color:var(--text-faint)}
+.status{margin-left:auto;flex:none;font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px}
+.s-open{background:var(--accent-soft);color:var(--accent)}.s-budget{background:var(--warn-soft);color:var(--warn)}
+.s-funded{background:var(--violet-soft);color:var(--violet)}.s-submitted{background:var(--warn-soft);color:var(--warn)}
+.s-completed{background:var(--good-soft);color:var(--good)}
+.steps{display:flex;gap:6px;margin:12px 0}
+.step{flex:1;text-align:center;font-size:10.5px;color:var(--text-faint);padding-top:16px;position:relative}
+.step::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:var(--surface-3);border:2px solid var(--border)}
+.step.done::before{background:var(--good);border-color:var(--good)}.step.done{color:var(--text-dim)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.meta{font-size:12px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
+.meta b{color:var(--text);font-weight:600}
+.accept{background:var(--good-soft);border-radius:8px;padding:8px 11px;font-size:12px;margin:10px 0;display:flex;gap:8px}
+.accept svg{width:14px;height:14px;color:var(--good);flex:none;margin-top:1px}
+.log{font-family:var(--f-m);font-size:11px;color:var(--text-dim);background:var(--surface-2);border-radius:8px;padding:8px 10px;margin-top:10px;max-height:120px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.empty{text-align:center;color:var(--text-faint);padding:34px 10px}
+.toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:var(--text);color:var(--bg);padding:10px 15px;border-radius:11px;font-size:13px;box-shadow:var(--shadow-lg);max-width:90vw;word-break:break-all}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.hin{flex-wrap:wrap}.wallet .b span{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hin">
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div>
+      <div><div class="bname">Arca</div><div class="bsub">Agent escrow · Arc</div></div>
+    </div>
+    <div class="net" id="net"><span class="dot" id="netdot"></span><span id="nettxt">Not connected</span></div>
+    <button class="btn btn-primary" id="connectBtn" onclick="connect()">Connect wallet</button>
+    <div class="wallet" id="walletBox" style="display:none">
+      <div class="b"><span class="top"><span id="wUsdc">–</span><span class="u">USDC</span></span><span class="sub"><span id="wGas">–</span> gas</span></div>
+      <div class="ava" id="wAva">–</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">ERC-8183 · ERC-8004 · USDC settlement</span>
+    <h1>Hire an agent. Pay on verified delivery.</h1>
+    <p>Fixed-price jobs with USDC held in on-chain escrow. For code bounties the test suite is the oracle — pass and the escrow releases automatically. Built on Arc's native agentic-commerce standards.</p>
+  </div>
+
+  <div class="banner" id="netBanner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><span>Connect a wallet on <b>Arc Testnet (chain 5042002)</b> to interact.</span><button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="switchNet()">Switch network</button></div>
+
+  <div class="stats">
+    <div class="stat"><div class="l">Your USDC</div><div class="v mono"><span id="sUsdc">–</span><small> USDC</small></div></div>
+    <div class="stat"><div class="l">Jobs you're tracking</div><div class="v" id="sJobs">0</div></div>
+    <div class="stat"><div class="l">Settlement</div><div class="v">0.8<small> sec · gas in USDC</small></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Post a code bounty</h2>
+    <div class="grid2">
+      <div class="field"><label>Provider (agent) address</label><input class="mono" id="fProvider" placeholder="0x…"></div>
+      <div class="field"><label>Evaluator address (auto-releases on pass)</label><input class="mono" id="fEvaluator" placeholder="0x…"></div>
+    </div>
+    <div class="field"><label>Title / description</label><input id="fDesc" placeholder="Fix failing test suite — release on green CI"></div>
+    <div class="grid2">
+      <div class="field"><label>Price (USDC)</label><input id="fPrice" type="number" value="2" min="0.1" step="0.1"></div>
+      <div class="field"><label>Acceptance criteria (machine-checkable)</label><input id="fAccept" placeholder="pytest -q passes in CI"></div>
+    </div>
+    <button class="btn btn-primary" id="postBtn" onclick="postJob()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Create job (client)</button>
+    <div class="hint">Creates the ERC-8183 job on-chain. The provider sets the budget, you fund the escrow, they submit, the evaluator releases. Switch wallet accounts to play each role.</div>
+  </div>
+
+  <h2 style="font-family:var(--f-d);font-size:18px;margin:22px 0 12px">Jobs</h2>
+  <div id="jobs"></div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+const CFG = {
+  chainId: 5042002,
+  chainHex: "0x4cef52",
+  rpc: "https://rpc.testnet.arc.io",
+  explorer: "https://explorer.testnet.arc.io",
+  usdc: "0x3600000000000000000000000000000000000000",
+  market: "0x0747EEf0706327138c69792bF28Cd525089e4583",
+  provider: "0x454C1881793932Ed4dd0f44C0B9df2fe0eAb9f09",
+  evaluator: "0xA0264B8c3A7E3E205e8b3D4A89e6884A4e5E267d",
+};
+const ERC20_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function approve(address,uint256) returns (bool)"
+];
+const MARKET_ABI = [
+  "function createJob(address provider,address evaluator,uint256 expiredAt,string description,address hook) returns (uint256)",
+  "function setBudget(uint256 jobId,uint256 amount,bytes optParams)",
+  "function fund(uint256 jobId,bytes optParams)",
+  "function submit(uint256 jobId,bytes32 deliverableHash,bytes optParams)",
+  "function complete(uint256 jobId,bytes32 reason,bytes optParams)"
+];
+const USDC_DEC = 6;
+
+let provider, signer, account, market, usdc;
+let jobs = loadJobs();
+
+async function connect(){
+  if(!window.ethereum){ toast("No wallet found — install Rabby or MetaMask"); return; }
+  provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = await provider.getSigner();
+  account = await signer.getAddress();
+  market = new ethers.Contract(CFG.market, MARKET_ABI, signer);
+  usdc = new ethers.Contract(CFG.usdc, ERC20_ABI, signer);
+  document.getElementById("connectBtn").style.display = "none";
+  document.getElementById("walletBox").style.display = "flex";
+  document.getElementById("wAva").textContent = account.slice(2,4).toUpperCase();
+  if(!val("fProvider")) setVal("fProvider", CFG.provider);
+  if(!val("fEvaluator")) setVal("fEvaluator", CFG.evaluator);
+  window.ethereum.on && window.ethereum.on("accountsChanged", ()=>location.reload());
+  window.ethereum.on && window.ethereum.on("chainChanged", ()=>location.reload());
+  await refresh(); render();
+}
+async function refresh(){
+  try{
+    const net = await provider.getNetwork();
+    const onArc = Number(net.chainId) === CFG.chainId;
+    document.getElementById("netdot").className = "dot " + (onArc?"ok":"bad");
+    document.getElementById("nettxt").textContent = onArc ? "Arc Testnet" : ("Wrong network ("+net.chainId+")");
+    document.getElementById("netBanner").className = "banner" + (onArc?" hide":"");
+    if(account){
+      const bal = await usdc.balanceOf(account);
+      const gas = await provider.getBalance(account);
+      const u = Number(ethers.formatUnits(bal, USDC_DEC)).toFixed(2);
+      document.getElementById("wUsdc").textContent = u;
+      document.getElementById("sUsdc").textContent = u;
+      document.getElementById("wGas").textContent = Number(ethers.formatUnits(gas,18)).toFixed(2);
+    }
+  }catch(e){ console.error(e); }
+}
+async function switchNet(){
+  if(!window.ethereum) return;
+  try{ await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CFG.chainHex}]}); }
+  catch(e){
+    if(e.code===4902){
+      await window.ethereum.request({method:"wallet_addEthereumChain",params:[{
+        chainId:CFG.chainHex,chainName:"Arc Testnet",nativeCurrency:{name:"USDC",symbol:"USDC",decimals:18},
+        rpcUrls:[CFG.rpc],blockExplorerUrls:[CFG.explorer]}]});
+    } else { console.error(e); }
+  }
+}
+
+async function postJob(){
+  if(!ensure()) return;
+  const prov = val("fProvider"), evalr = val("fEvaluator");
+  const desc = val("fDesc") || "Code bounty";
+  const price = val("fPrice") || "2";
+  const accept = val("fAccept") || "tests pass";
+  if(!ethers.isAddress(prov) || !ethers.isAddress(evalr)){ toast("Provider/evaluator must be valid 0x addresses"); return; }
+  const expiredAt = Math.floor(Date.now()/1000) + 7*24*3600;
+  await run("postBtn", async ()=>{
+    let jobId;
+    try{ jobId = await market.createJob.staticCall(prov, evalr, expiredAt, desc, ethers.ZeroAddress); }
+    catch(e){ console.warn("staticCall failed", e); }
+    const r = await market.createJob(prov, evalr, expiredAt, desc, ethers.ZeroAddress);
+    const rc = await r.wait();
+    const job = { id:"j"+Date.now(), jobId: jobId!=null? jobId.toString():"(see tx)",
+      client:account, provider:prov, evaluator:evalr, desc, price, accept,
+      status:"open", tx:{create:rc.hash} };
+    jobs.push(job); saveJobs(); render();
+    return rc.hash;
+  }, "Job created on-chain");
+}
+async function setBudget(id){ const j=find(id); if(!j||!ensure())return;
+  await run("b_"+id, async ()=>{ const amt=ethers.parseUnits(String(j.price),USDC_DEC);
+    const rc=await (await market.setBudget(j.jobId,amt,"0x")).wait();
+    j.status="budget"; j.tx.budget=rc.hash; saveJobs(); render(); return rc.hash; }, "Budget set");
+}
+async function fundJob(id){ const j=find(id); if(!j||!ensure())return;
+  await run("f_"+id, async ()=>{ const amt=ethers.parseUnits(String(j.price),USDC_DEC);
+    await (await usdc.approve(CFG.market,amt)).wait();
+    const rc=await (await market.fund(j.jobId,"0x")).wait();
+    j.status="funded"; j.tx.fund=rc.hash; saveJobs(); render(); return rc.hash; }, "Escrow funded (USDC locked)");
+}
+async function submitJob(id){ const j=find(id); if(!j||!ensure())return;
+  const commit=prompt("Commit SHA / deliverable ref:", "commit-"+Math.random().toString(16).slice(2,8));
+  if(commit===null)return;
+  await run("s_"+id, async ()=>{ const h=ethers.keccak256(ethers.toUtf8Bytes(commit));
+    const rc=await (await market.submit(j.jobId,h,"0x")).wait();
+    j.status="submitted"; j.commit=commit; j.tx.submit=rc.hash; saveJobs(); render(); return rc.hash; }, "Deliverable submitted");
+}
+async function completeJob(id){ const j=find(id); if(!j||!ensure())return;
+  await run("c_"+id, async ()=>{ const reason=ethers.keccak256(ethers.toUtf8Bytes("tests-passed"));
+    const rc=await (await market.complete(j.jobId,reason,"0x")).wait();
+    j.status="completed"; j.tx.complete=rc.hash; saveJobs(); render(); return rc.hash; }, "USDC released to provider");
+}
+
+const STEPS=["open","budget","funded","submitted","completed"];
+const SLABEL={open:"Created",budget:"Budget set",funded:"Funded",submitted:"Submitted",completed:"Released"};
+function role(j){ if(!account) return null; const a=account.toLowerCase();
+  if(a===(j.client||"").toLowerCase())return"client";
+  if(a===(j.provider||"").toLowerCase())return"provider";
+  if(a===(j.evaluator||"").toLowerCase())return"evaluator"; return"viewer"; }
+function render(){
+  document.getElementById("sJobs").textContent = jobs.length;
+  const el=document.getElementById("jobs");
+  if(!jobs.length){ el.innerHTML=`<div class="empty">No jobs yet. Post a bounty above to create one on-chain.</div>`; return; }
+  el.innerHTML = jobs.slice().reverse().map(j=>{
+    const si=STEPS.indexOf(j.status), r=role(j), acts=[];
+    if(r==="provider"&&j.status==="open") acts.push(mkBtn("b_"+j.id,"Set budget","btn-primary","setBudget('"+j.id+"')"));
+    if(r==="client"&&j.status==="budget") acts.push(mkBtn("f_"+j.id,"Approve & fund","btn-primary","fundJob('"+j.id+"')"));
+    if(r==="provider"&&j.status==="funded") acts.push(mkBtn("s_"+j.id,"Submit delivery","btn-primary","submitJob('"+j.id+"')"));
+    if(r==="evaluator"&&j.status==="submitted") acts.push(mkBtn("c_"+j.id,"Verify & release","btn-good","completeJob('"+j.id+"')"));
+    const txt=Object.entries(j.tx||{}).map(([k,h])=>k+": <a href='"+CFG.explorer+"/tx/"+h+"' target='_blank'>"+h.slice(0,14)+"…</a>").join("\n");
+    return `<div class="job">
+      <div class="job-h"><div><h3>${esc(j.desc)}</h3><div class="id">job ${esc(j.jobId)} ${r?("· you are "+r):""}</div></div>
+        <span class="status s-${j.status}">${SLABEL[j.status]}</span></div>
+      <div class="accept"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><div><b>Accepts on:</b> ${esc(j.accept)}</div></div>
+      <div class="meta"><span>Price <b class="mono">${esc(j.price)} USDC</b></span><span>Provider <b class="mono">${short(j.provider)}</b></span><span>Evaluator <b class="mono">${short(j.evaluator)}</b></span></div>
+      <div class="steps">${STEPS.map((s,i)=>`<div class="step ${i<=si?'done':''}">${SLABEL[s]}</div>`).join("")}</div>
+      ${acts.length?`<div class="acts">${acts.join("")}</div>`:`<div class="hint">${r&&r!=="viewer"?"Waiting on another role.":"Connect as client / provider / evaluator to act."}</div>`}
+      ${txt?`<div class="log">${txt}</div>`:""}
+    </div>`;
+  }).join("");
+}
+function mkBtn(id,label,cls,fn){ return "<button class='btn "+cls+" btn-sm' id='"+id+"' onclick=\""+fn+"\">"+label+"</button>"; }
+
+function ensure(){ if(!account){toast("Connect your wallet first");return false;} return true; }
+function val(id){ const e=document.getElementById(id); return e? e.value.trim():""; }
+function setVal(id,v){ const e=document.getElementById(id); if(e)e.value=v; }
+function short(a){ return a? a.slice(0,6)+"…"+a.slice(-4):"—"; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function find(id){ return jobs.find(j=>j.id===id); }
+function loadJobs(){ try{ return JSON.parse(localStorage.getItem("arca_jobs")||"[]"); }catch(e){ return []; } }
+function saveJobs(){ try{ localStorage.setItem("arca_jobs",JSON.stringify(jobs)); }catch(e){} }
+
+async function run(btnId, fn, okMsg){
+  const b=document.getElementById(btnId); const old=b?b.innerHTML:"";
+  if(b){ b.disabled=true; b.textContent="Confirm in wallet…"; }
+  try{ const h=await fn(); toast("✅ "+okMsg); if(h) toast(CFG.explorer+"/tx/"+h); await refresh(); }
+  catch(e){ console.error(e); toast("⚠ "+(e.shortMessage||e.reason||e.message||"tx failed")); }
+  finally{ if(b){ b.disabled=false; b.innerHTML=old; } }
+}
+function toast(m){ const t=document.createElement("div"); t.className="toast"; t.textContent=m;
+  document.getElementById("toasts").appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition=".3s"; setTimeout(()=>t.remove(),300); },3600); }
+
+render();
+</script>
+</body>
+</html>
