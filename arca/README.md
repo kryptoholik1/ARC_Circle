@@ -95,7 +95,15 @@ evaluator/
 `0xb10a0f00DE384eadB5e90000d0703637354e5a21`
 → https://explorer.arc.io/address/0xb10a0f00DE384eadB5e90000d0703637354e5a21
 
-Testnet: `0x912c3BD3d6d7352e48735769678b3901806aD155` — full post → claim → submit → release cycle verified on-chain. See `contracts/deployments.json`.
+Testnet: `0x912c3BD3d6d7352e48735769678b3901806aD155` — full cycle verified on-chain. See `contracts/deployments.json`.
+
+**Live end-to-end run on Arc Mainnet** (job #1): a real code bounty where the agent's fix was verified by an automated `pytest` run, which then released the USDC — no human approval:
+- postJob: `explorer.arc.io/tx/4b876398cda9f2e9747b7817cca5c46ed0b3a9bba3206caac6ff80829e931443`
+- claim: `.../59557bb7655dd7e080acc42ecd16dea70d5fcc8c359f5837801b749b19c85005`
+- submit: `.../6212eb2c795d975c01de104337daa96b2be0a4307fedc31bd8321ea09e7f5e64`
+- release (test-driven): `.../f6d92457ff2c142ab14bc85d388f1a51b717348d787604545eb838de5e931642`
+
+Live dApp: https://kryptoholik1.github.io/ARC_Circle/arca/web/
 
 ## Status
 
