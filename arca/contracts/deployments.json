@@ -1,0 +1,18 @@
+{
+  "ArcaEscrow": {
+    "mainnet": {
+      "chainId": 5042,
+      "address": "0xb10a0f00DE384eadB5e90000d0703637354e5a21",
+      "explorer": "https://explorer.arc.io/address/0xb10a0f00DE384eadB5e90000d0703637354e5a21",
+      "usdc": "0x3600000000000000000000000000000000000000",
+      "deployBlock": 21416207
+    },
+    "testnet": {
+      "chainId": 5042002,
+      "address": "0x912c3BD3d6d7352e48735769678b3901806aD155",
+      "explorer": "https://explorer.testnet.arc.io/address/0x912c3BD3d6d7352e48735769678b3901806aD155",
+      "usdc": "0x3600000000000000000000000000000000000000"
+    }
+  },
+  "compiler": { "solc": "0.8.24", "evmVersion": "paris", "optimizer": false }
+}

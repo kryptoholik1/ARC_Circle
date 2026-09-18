@@ -89,12 +89,22 @@ evaluator/
   evaluator.py          watches submitted job, verifies, calls complete()
 ```
 
+## Live deployment
+
+**ArcaEscrow** (our own open-bounty escrow contract) is live on **Arc Mainnet**:
+`0xb10a0f00DE384eadB5e90000d0703637354e5a21`
+→ https://explorer.arc.io/address/0xb10a0f00DE384eadB5e90000d0703637354e5a21
+
+Testnet: `0x912c3BD3d6d7352e48735769678b3901806aD155` — full post → claim → submit → release cycle verified on-chain. See `contracts/deployments.json`.
+
 ## Status
 
-- [x] Live on Arc Testnet: RPC, funded wallet, native contracts verified
-- [x] Full ERC-8183 lifecycle wired in Python
-- [x] Automated code-bounty evaluator
-- [ ] Frontend dApp (Arca UI) — wallet connect + live jobs from chain events
-- [ ] Mainnet deployment (pending Arc mainnet access)
+- [x] Custom `ArcaEscrow` contract — open bounty + claim + escrow + evaluator release
+- [x] Deployed & verified on Arc **Testnet** (full lifecycle cycled with real USDC)
+- [x] Deployed on Arc **Mainnet**
+- [x] Automated code-bounty evaluator (tests = oracle)
+- [x] Frontend dApp — wallet connect (Rabby/MetaMask), live escrow flow
+- [ ] Point dApp at the mainnet ArcaEscrow + open-bounty UI
+- [ ] Reputation-gated claim via ERC-8004 (v2)
 
 Built for the **Arc Microgrants** (Circle / DoraHacks).
